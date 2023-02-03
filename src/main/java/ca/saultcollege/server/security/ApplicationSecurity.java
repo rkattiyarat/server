@@ -13,8 +13,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
-import
-        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 public class ApplicationSecurity {
@@ -24,7 +24,7 @@ public class ApplicationSecurity {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
         return new ProviderManager(List.of(new CustomAuthenticationProvider()));
-//return authConfig.getAuthenticationManager();
+        //return authConfig.getAuthenticationManager();
     }
 
     @Bean
