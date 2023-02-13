@@ -14,17 +14,36 @@ import org.springframework.security.config.annotation.authentication.configurati
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ca.saultcollege.server.repositories.AccountRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
 @Configuration
 public class ApplicationSecurity {
     @Autowired private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
-        return new ProviderManager(List.of(new CustomAuthenticationProvider()));
-        //return authConfig.getAuthenticationManager();
+        //return new ProviderManager(List.of(new CustomAuthenticationProvider()));
+        return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) throws
+                    UsernameNotFoundException {
+                return accountRepository.findByEmail(username)
+                        .orElseThrow(
+                                () -> new UsernameNotFoundException("User " + username + " not found"));
+            }
+        };
     }
 
     @Bean
@@ -37,7 +56,7 @@ public class ApplicationSecurity {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
-                .requestMatchers("/auth/login", "/publiccontent").permitAll()
+                .requestMatchers("/auth/login", "/publiccontent","/signup").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(
                 (request, response, ex) -> {

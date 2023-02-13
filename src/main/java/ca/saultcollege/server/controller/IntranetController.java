@@ -2,7 +2,9 @@ package ca.saultcollege.server.controller;
 
 import ca.saultcollege.server.data.Account;
 import ca.saultcollege.server.data.content;
+import ca.saultcollege.server.repositories.AccountRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ca.saultcollege.server.security.JwtTokenUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,34 +12,75 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ca.saultcollege.server.data.AuthRequest;
 import ca.saultcollege.server.data.AuthResponse;
 import jakarta.validation.Valid;
-import
-        org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
-
+import ca.saultcollege.server.data.Registry;
+import ca.saultcollege.server.repositories.RegistryRepository;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class IntranetController {
+
+    private Boolean updateRegistry(String registryKey, String registryValue) {
+    //Find the record for the registry entry based on the supplied key
+        List<Registry> registryEntries = registryRepository.findByRegistryKey(registryKey);
+        Registry registryEntry = new Registry();
+        if (registryEntries.size() == 0) {
+            registryEntry.setRegistryKey(registryKey);
+        } else {
+            registryEntry = registryEntries.get(0);
+        }
+        registryEntry.setRegistryValue(registryValue);
+    //Update the registry table with new value
+        registryRepository.save(registryEntry);
+        return true;
+    }
+
     @Autowired
     AuthenticationManager authManager;
     @Autowired
     JwtTokenUtil jwtUtil;
+    @Autowired
+    RegistryRepository registryRepository;
+    @Autowired
+    AccountRepository accountRepository;
 
+    @PutMapping("/publiccontent")
+    public ResponseEntity<Boolean> savePublicContent(@RequestBody @Valid Registry content) {
+        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
+        return ResponseEntity.ok(result);
+    }
+    @PutMapping("/staffcontent")
+    public ResponseEntity<Boolean> saveStaffContent(@RequestBody @Valid Registry content)
+    {
+        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
+        return ResponseEntity.ok(result);
+    }
     @GetMapping("/publiccontent")
     public ResponseEntity<String> getPublicContent() {
-        return ResponseEntity.ok("getPublicContent().");
+        return ResponseEntity.ok(getRegistry("public_content"));
     }
 
     @GetMapping("/staffcontent")
     public ResponseEntity<String> getStaffContent() {
-        return ResponseEntity.ok("getStaffContent().");
+        return ResponseEntity.ok(getRegistry("staff_content"));
     }
 
+//    @PostMapping("/signup")
+//    public ResponseEntity<String> signUp(@RequestBody Account account) {
+//        return ResponseEntity.ok("singUp()." + account.getFirstName());
+//    }
+
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody Account account) {
-        return ResponseEntity.ok("singUp()." + account.getFirstName());
+    public ResponseEntity<String> createAccount(@RequestBody Account signUpFormData) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String password = passwordEncoder.encode(signUpFormData.getPassword());
+        Account newAccount = new Account(signUpFormData.getEmail(), password);
+        Account savedAccount = accountRepository.save(newAccount);
+        return ResponseEntity.ok("createAccount(): " + signUpFormData.getEmail());
     }
 
     @GetMapping("/login")
@@ -61,9 +104,10 @@ public class IntranetController {
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(), request.getPassword())
             );
-            Account account = new Account();
-            account.setId(1);
-            account.setEmail(authentication.getPrincipal().toString());
+//            Account account = new Account();
+//            account.setId(1);
+//            account.setEmail(authentication.getPrincipal().toString());
+            Account account = (Account) authentication.getPrincipal();
             String accessToken = jwtUtil.generateAccessToken(account);
             AuthResponse response = new AuthResponse(account.getEmail(), accessToken);
             return ResponseEntity.ok().body(response);
@@ -71,5 +115,17 @@ public class IntranetController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    private String getRegistry(String registryKey) {
+    //Find the record for the registry entry based on the supplied key
+        List<Registry> registryEntries = registryRepository.findByRegistryKey(registryKey);
+        Registry registryEntry = new Registry();
+        if (registryEntries.size() == 0) {
+            return "";
+        }
+        return registryEntries.get(0).getRegistryValue();
+    }
+
+
 
 }

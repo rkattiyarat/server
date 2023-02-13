@@ -2,22 +2,36 @@ package ca.saultcollege.server.data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "accounts")
 public class Account implements UserDetails{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String FirstName;
-    private String LastName;
-    private String Email;
-    private String Password;
-    private String ConfirmPassword;
-    private String Role;
+    private String firstName;
+    private String lastName;
+    @Column(nullable = false,length = 50,unique = true)
+    private String email;
+    @Column(nullable = false, length = 64)
+    private String password;
+    @Transient
+    private String confirmPassword;
+    private String role;
 
     public Account() {
-        this.FirstName = "";
-        this.LastName = "";
-        this.Email = "";
-        this.Password = "";
-        this.Role = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.password = "";
+        this.role = "";
+    }
+
+    public Account(String email, String password) {
+
+        this.email = email;
+        this.password = password;
     }
 
     @Override
@@ -27,23 +41,23 @@ public class Account implements UserDetails{
 
     @Override
     public String getUsername() {
-        return null;
+        return email;
     }
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
     public int getId() {
         return id;
@@ -54,50 +68,50 @@ public class Account implements UserDetails{
     }
 
     public String getFirstName() {
-        return FirstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-        FirstName = firstName;
+        firstName = firstName;
     }
 
     public String getLastName() {
-        return LastName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-        LastName = lastName;
+        lastName = lastName;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
+        email = email;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     public void setPassword(String password) {
-        Password = password;
+        password = password;
     }
 
     public String getConfirmPassword() {
-        return ConfirmPassword;
+        return confirmPassword;
     }
 
     public void setConfirmPassword(String confirmPassword) {
-        ConfirmPassword = confirmPassword;
+        confirmPassword = confirmPassword;
     }
 
     public String getRole() {
-        return Role;
+        return role;
     }
 
     public void setRole(String role) {
-        Role = role;
+        role = role;
     }
 }
