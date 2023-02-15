@@ -39,14 +39,10 @@ public class IntranetController {
         return true;
     }
 
-    @Autowired
-    AuthenticationManager authManager;
-    @Autowired
-    JwtTokenUtil jwtUtil;
-    @Autowired
-    RegistryRepository registryRepository;
-    @Autowired
-    AccountRepository accountRepository;
+    @Autowired AuthenticationManager authManager;
+    @Autowired JwtTokenUtil jwtUtil;
+    @Autowired RegistryRepository registryRepository;
+    @Autowired AccountRepository accountRepository;
 
     @PutMapping("/publiccontent")
     public ResponseEntity<Boolean> savePublicContent(@RequestBody @Valid Registry content) {
@@ -69,11 +65,6 @@ public class IntranetController {
         return ResponseEntity.ok(getRegistry("staff_content"));
     }
 
-//    @PostMapping("/signup")
-//    public ResponseEntity<String> signUp(@RequestBody Account account) {
-//        return ResponseEntity.ok("singUp()." + account.getFirstName());
-//    }
-
     @PostMapping("/signup")
     public ResponseEntity<String> createAccount(@RequestBody Account signUpFormData) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -81,11 +72,6 @@ public class IntranetController {
         Account newAccount = new Account(signUpFormData.getEmail(), password);
         Account savedAccount = accountRepository.save(newAccount);
         return ResponseEntity.ok("createAccount(): " + signUpFormData.getEmail());
-    }
-
-    @GetMapping("/login")
-    public ResponseEntity<String> logIn() {
-        return ResponseEntity.ok("logIn().");
     }
 
     @PutMapping("/editpubliccontent")
@@ -100,10 +86,7 @@ public class IntranetController {
     @PostMapping("/auth/login")
     public ResponseEntity<?> logIn(@RequestBody @Valid AuthRequest request){
         try {
-            Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(), request.getPassword())
-            );
+            Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 //            Account account = new Account();
 //            account.setId(1);
 //            account.setEmail(authentication.getPrincipal().toString());
@@ -125,7 +108,4 @@ public class IntranetController {
         }
         return registryEntries.get(0).getRegistryValue();
     }
-
-
-
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ca.saultcollege.server.repositories.AccountRepository;
@@ -22,7 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Configuration
 public class ApplicationSecurity {
-    @Autowired private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
     @Autowired
     private AccountRepository accountRepository;
 

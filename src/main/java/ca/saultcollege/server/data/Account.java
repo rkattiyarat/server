@@ -21,11 +21,11 @@ public class Account implements UserDetails{
     private String role;
 
     public Account() {
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
-        this.password = "";
-        this.role = "";
+//        this.firstName = "";
+//        this.lastName = "";
+//        this.email = "";
+//        this.password = "";
+//        this.role = "";
     }
 
     public Account(String email, String password) {
@@ -72,7 +72,7 @@ public class Account implements UserDetails{
     }
 
     public void setFirstName(String firstName) {
-        firstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -80,7 +80,7 @@ public class Account implements UserDetails{
     }
 
     public void setLastName(String lastName) {
-        lastName = lastName;
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -88,7 +88,7 @@ public class Account implements UserDetails{
     }
 
     public void setEmail(String email) {
-        email = email;
+        this.email = email;
     }
 
     public String getPassword() {
@@ -96,7 +96,7 @@ public class Account implements UserDetails{
     }
 
     public void setPassword(String password) {
-        password = password;
+        this.password = password;
     }
 
     public String getConfirmPassword() {
@@ -104,7 +104,7 @@ public class Account implements UserDetails{
     }
 
     public void setConfirmPassword(String confirmPassword) {
-        confirmPassword = confirmPassword;
+        this.confirmPassword = confirmPassword;
     }
 
     public String getRole() {
@@ -112,6 +112,6 @@ public class Account implements UserDetails{
     }
 
     public void setRole(String role) {
-        role = role;
+        this.role = role;
     }
 }
