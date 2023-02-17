@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import ca.saultcollege.server.data.Registry;
 import ca.saultcollege.server.repositories.RegistryRepository;
 import java.util.List;
+import ca.saultcollege.server.repositories.AccountRepository;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -69,18 +70,11 @@ public class IntranetController {
     public ResponseEntity<String> createAccount(@RequestBody Account signUpFormData) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String password = passwordEncoder.encode(signUpFormData.getPassword());
-        Account newAccount = new Account(signUpFormData.getEmail(), password);
-        Account savedAccount = accountRepository.save(newAccount);
+        signUpFormData.setPassword(password);
+        Account savedAccount = accountRepository.save(signUpFormData);
+//        Account newAccount = new Account(signUpFormData.getEmail(), password);
+//        Account savedAccount = accountRepository.save(newAccount);
         return ResponseEntity.ok("createAccount(): " + signUpFormData.getEmail());
-    }
-
-    @PutMapping("/editpubliccontent")
-    public ResponseEntity<String> editPublicContent(@RequestBody content content) {
-        return ResponseEntity.ok("editPublicContent()."+content.getPublicContent());
-    }
-    @PutMapping("/editstaffcontent")
-    public ResponseEntity<String> editStaffContent(@RequestBody content content) {
-        return ResponseEntity.ok("editStaffContent()."+content.getStaffContent());
     }
 
     @PostMapping("/auth/login")
