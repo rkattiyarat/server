@@ -39,9 +39,7 @@ public class ApplicationSecurity {
             @Override
             public UserDetails loadUserByUsername(String username) throws
                     UsernameNotFoundException {
-                return accountRepository.findByEmail(username)
-                        .orElseThrow(
-                                () -> new UsernameNotFoundException("User " + username + " not found"));
+                return accountRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
             }
         };
     }
@@ -56,17 +54,8 @@ public class ApplicationSecurity {
         http.cors();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeHttpRequests()
-                .requestMatchers("/auth/login", "/publiccontent","/signup").permitAll()
-                .anyRequest().authenticated();
-        http.exceptionHandling().authenticationEntryPoint(
-                (request, response, ex) -> {
-                    response.sendError(
-                            HttpServletResponse.SC_UNAUTHORIZED,
-                            ex.getMessage()
-                    );
-                }
-        );
+        http.authorizeHttpRequests().requestMatchers("/auth/login","/auth/refreshtoken", "/publiccontent","/signup").permitAll().anyRequest().authenticated();
+        http.exceptionHandling().authenticationEntryPoint((request, response, ex) -> {response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());});
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

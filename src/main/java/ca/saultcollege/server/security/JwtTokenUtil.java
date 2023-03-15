@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtTokenUtil {
-    private static final long EXPIRE_DURATION = 60 * 60 * 1000;
+    private static final long EXPIRE_DURATION = 60 * 1000; // a minute
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @Value("${app.jwt.secret}")
