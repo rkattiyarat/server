@@ -34,7 +34,8 @@ jobs:
       with:
         image: rkattiyarat/intranet
         tags: latest
-        registry: DockerFile
+        registry: docker.io
+        dockerfile: DockerFile
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
