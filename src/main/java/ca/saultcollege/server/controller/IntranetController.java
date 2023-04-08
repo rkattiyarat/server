@@ -2,6 +2,7 @@ package ca.saultcollege.server.controller;
 
 import ca.saultcollege.server.data.*;
 import ca.saultcollege.server.repositories.AccountRepository;
+import ca.saultcollege.server.repositories.MessageRepository;
 import ca.saultcollege.server.security.RefreshTokenUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,12 @@ import ca.saultcollege.server.repositories.AccountRepository;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class IntranetController {
+    @Autowired AuthenticationManager authManager;
+    @Autowired JwtTokenUtil jwtUtil;
+    @Autowired RegistryRepository registryRepository;
+    @Autowired AccountRepository accountRepository;
+    @Autowired RefreshTokenUtil refreshTokenUtil;
+    @Autowired MessageRepository messageRepository;
 
     private Boolean updateRegistry(String registryKey, String registryValue) {
     //Find the record for the registry entry based on the supplied key
@@ -37,31 +44,14 @@ public class IntranetController {
         return true;
     }
 
-    @Autowired AuthenticationManager authManager;
-    @Autowired JwtTokenUtil jwtUtil;
-    @Autowired RegistryRepository registryRepository;
-    @Autowired AccountRepository accountRepository;
-    @Autowired RefreshTokenUtil refreshTokenUtil;
-
-    @PutMapping("/publiccontent")
-    public ResponseEntity<Boolean> savePublicContent(@RequestBody @Valid Registry content) {
-        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
-        return ResponseEntity.ok(result);
-    }
-    @PutMapping("/staffcontent")
-    public ResponseEntity<Boolean> saveStaffContent(@RequestBody @Valid Registry content)
-    {
-        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
-        return ResponseEntity.ok(result);
-    }
-    @GetMapping("/publiccontent")
-    public ResponseEntity<String> getPublicContent() {
-        return ResponseEntity.ok(getRegistry("public_content"));
-    }
-
-    @GetMapping("/staffcontent")
-    public ResponseEntity<String> getStaffContent() {
-        return ResponseEntity.ok(getRegistry("staff_content"));
+    private String getRegistry(String registryKey) {
+        //Find the record for the registry entry based on the supplied key
+        List<Registry> registryEntries = registryRepository.findByRegistryKey(registryKey);
+        Registry registryEntry = new Registry();
+        if (registryEntries.size() == 0) {
+            return "";
+        }
+        return registryEntries.get(0).getRegistryValue();
     }
 
     @PostMapping("/signup")
@@ -70,8 +60,6 @@ public class IntranetController {
         String password = passwordEncoder.encode(signUpFormData.getPassword());
         signUpFormData.setPassword(password);
         Account savedAccount = accountRepository.save(signUpFormData);
-//        Account newAccount = new Account(signUpFormData.getEmail(), password);
-//        Account savedAccount = accountRepository.save(newAccount);
         return ResponseEntity.ok("createAccount(): " + signUpFormData.getEmail());
     }
 
@@ -111,14 +99,57 @@ public class IntranetController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    private String getRegistry(String registryKey) {
-    //Find the record for the registry entry based on the supplied key
-        List<Registry> registryEntries = registryRepository.findByRegistryKey(registryKey);
-        Registry registryEntry = new Registry();
-        if (registryEntries.size() == 0) {
-            return "";
-        }
-        return registryEntries.get(0).getRegistryValue();
+    @GetMapping("/publiccontent")
+    public ResponseEntity<String> getPublicContent() {
+        return ResponseEntity.ok(getRegistry("public_content"));
     }
+
+    @PutMapping("/publiccontent")
+    public ResponseEntity<Boolean> savePublicContent(@RequestBody @Valid Registry content) {
+        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/staffcontent")
+    public ResponseEntity<String> getStaffContent() {
+        return ResponseEntity.ok(getRegistry("staff_content"));
+    }
+
+    @PutMapping("/staffcontent")
+    public ResponseEntity<Boolean> saveStaffContent(@RequestBody @Valid Registry content)
+    {
+        Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/messages")
+    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
+        Message saveMessage = messageRepository.save(message);
+        return ResponseEntity.ok(saveMessage);
+    }
+
+//    @GetMapping("/messages")
+//    public ResponseEntity<String> getMessages() {
+//        return ResponseEntity.ok(getMessages("rose"));
+//    }
+
+    //get all messages
+    @GetMapping("/messages")
+    public ResponseEntity<List<Message>> getMessages() {
+        List<Message> messages = messageRepository.findAll();
+        return ResponseEntity.ok(messageRepository.findBySender("rose"));
+    }
+
+    @PutMapping("/messages")
+    public ResponseEntity<Boolean> saveMessage(@RequestBody @Valid Message message) {
+        messageRepository.save(message);
+        return ResponseEntity.ok(true);
+    }
+
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity<Boolean> deleteMessage(@PathVariable("id") int id) {
+        messageRepository.deleteById(id);
+        return ResponseEntity.ok(true);
+    }
+
 }
