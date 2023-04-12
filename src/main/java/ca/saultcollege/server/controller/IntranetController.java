@@ -121,12 +121,12 @@ public class IntranetController {
         Boolean result = updateRegistry(content.getRegistryKey(), content.getRegistryValue());
         return ResponseEntity.ok(result);
     }
-
-    @PostMapping("/messages")
-    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
-        Message saveMessage = messageRepository.save(message);
-        return ResponseEntity.ok(saveMessage);
-    }
+//
+//    @PostMapping("/messages")
+//    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
+//        Message saveMessage = messageRepository.save(message);
+//        return ResponseEntity.ok(saveMessage);
+//    }
 
 //    @GetMapping("/messages")
 //    public ResponseEntity<String> getMessages() {
@@ -143,12 +143,6 @@ public class IntranetController {
     @PutMapping("/messages")
     public ResponseEntity<Boolean> saveMessage(@RequestBody @Valid Message message) {
         messageRepository.save(message);
-        return ResponseEntity.ok(true);
-    }
-
-    @DeleteMapping("/messages/{id}")
-    public ResponseEntity<Boolean> deleteMessage(@PathVariable("id") int id) {
-        messageRepository.deleteById(id);
         return ResponseEntity.ok(true);
     }
 
