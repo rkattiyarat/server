@@ -1,9 +1,9 @@
 package ca.saultcollege.server.controller;
 
 import ca.saultcollege.server.data.*;
-import ca.saultcollege.server.repositories.AccountRepository;
-import ca.saultcollege.server.repositories.MessageRepository;
+import ca.saultcollege.server.repositories.*;
 import ca.saultcollege.server.security.RefreshTokenUtil;
+import org.aspectj.weaver.ast.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
-import ca.saultcollege.server.repositories.RegistryRepository;
+
 import java.util.List;
 import ca.saultcollege.server.repositories.AccountRepository;
 
@@ -28,6 +28,8 @@ public class IntranetController {
     @Autowired AccountRepository accountRepository;
     @Autowired RefreshTokenUtil refreshTokenUtil;
     @Autowired MessageRepository messageRepository;
+    @Autowired PostRepository postRepository;
+
 
     private Boolean updateRegistry(String registryKey, String registryValue) {
     //Find the record for the registry entry based on the supplied key
@@ -143,6 +145,25 @@ public class IntranetController {
     @PutMapping("/messages")
     public ResponseEntity<Boolean> saveMessage(@RequestBody @Valid Message message) {
         messageRepository.save(message);
+        return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<String> getContent() {
+        return ResponseEntity.ok(postRepository.findByAuthorId(1).getContent());
+    }
+
+    @GetMapping("/posts/id")
+    public ResponseEntity<Integer> getAuthorId() {
+        return ResponseEntity.ok(postRepository.findByAuthorId(1).getAuthorId());
+    }
+
+
+
+
+    @PutMapping("/posts")
+    public ResponseEntity<Boolean> saveContent(@RequestBody @Valid Post post) {
+        postRepository.save(post);
         return ResponseEntity.ok(true);
     }
 
